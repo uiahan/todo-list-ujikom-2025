@@ -1,0 +1,15 @@
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+.text-second {
+    color: hsl(228, 8%, 56%) !important;
+}
+
+.bg-first {
+    background-color: hsl(228, 100%, 99%);
+}
+
+.border-left-brown {
+    border-left: hsl(228, 8%, 56%) 4px solid !important;
+}
