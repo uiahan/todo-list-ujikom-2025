@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="{{ asset('bootstraps/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="https://naramizaru.github.io/fa-pro/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('css')
 </head>
-<body style="background-color: #f2f2f2">
+<body style="background-color: #f7f0f0">
     @yield('content')
     @include('components.notification')
 </body>

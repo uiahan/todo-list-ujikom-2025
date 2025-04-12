@@ -19,7 +19,7 @@
                 <div class="card text-second p-3 border-0 shadow-lg mt-4">
                     <div class="d-flex justify-content-between">
                         <h4>My Job</h4>
-                        <a href="" data-bs-toggle="tooltip" data-bs-title="Add Job" class="btn btn-primary"><i class="fa-regular fa-plus"></i></a>
+                        <button data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-title="Add Job" class="btn btn-primary"><i class="fa-regular fa-plus"></i></button>
                     </div>
                     <hr>
                     <table class="table table-bordered text-second" id="myTable">
@@ -45,26 +45,78 @@
                                     <button class="btn btn-danger" data-bs-toggle="tooltip" data-bs-title="Delete"><i class="fa-regular fa-trash"></i></button>
                                 </td>
                             </tr>
-                            {{-- Tambahkan baris lainnya di sini --}}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- add job modal --}}
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog text-second modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Add My Job</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div>
+                    <label for="title">Title</label>
+                    <input required type="text" class="form-control" name="title">
+                </div>
+                <div class="mt-3">
+                    <label for="description">Description</label>
+                    <textarea required type="text" class="form-control" name="description"></textarea>
+                </div>
+                <div class="mt-3">
+                    <label for="image">Image</label>
+                    <input type="file" accept="image/*" class="form-control" required>
+                </div>
+                <div class="mt-3">
+                    <label for="video">Video</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="mt-3">
+                    <label for="deadline">Deadline</label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="mt-3">
+                    <label for="repetition">Repetition</label>
+                    <select name="repetition" id="" class="form-control">
+                        <option value="none" selected>None</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="moonthly">Moonthly</option>
+                    </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
 @endsection
 
 @push('js')
-    {{-- jQuery dan DataTables v1.10.25 --}}
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
     <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        new DataTable('#myTable');
+
+        document.querySelectorAll('[data-bs-title]').forEach(el => {
+    new bootstrap.Tooltip(el);
+});
+
     </script>
 
     <script>
-        new DataTable('#myTable');
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
 @endpush
