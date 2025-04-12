@@ -12,4 +12,9 @@ class ManageJobController extends Controller
         $user = Auth::user();
         return view('pages.tasker.job.index', compact('user'));
     }
+
+    public function viewJob() {
+        $user = Auth::user();
+        return view('pages.tasker.job.view-job', compact('user'));
+    }
 }

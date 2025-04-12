@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\ManageWorkerController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Tasker\ManageJobController;
 use App\Http\Controllers\Tasker\TaskerController;
+use App\Http\Controllers\Worker\JobController;
+use App\Http\Controllers\Worker\QuestController;
 use App\Http\Controllers\Worker\WorkerController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,9 +32,16 @@ Route::group(['prefix' => 'tasker', 'middleware' => ['can:tasker']], function ()
     Route::get('/dashboard', [TaskerController::class, 'dashboard'])->name('dashboard.tasker');
     Route::group(['prefix' => 'manage-job', 'controller' => ManageJobController::class], function(){
         Route::get('/', 'index')->name('manage.job');
+        Route::get('/view-job', 'viewJob')->name('view.job');
     });
 });
 
 Route::group(['prefix' => 'worker', 'middleware' => ['can:worker']], function (){
     Route::get('/dashboard', [WorkerController::class, 'dashboard'])->name('dashboard.worker');
+    Route::group(['prefix' => 'my-job', 'controller' => JobController::class], function() {
+        Route::get('/', 'index')->name('job');
+    });
+    Route::group(['prefix' => 'quest-list', 'controller' => QuestController::class], function() {
+        Route::get('/', 'index')->name('quest');
+    });
 });

@@ -14,6 +14,21 @@
                 <div class="text-second border-left-brown card px-3 pt-3 pb-2 border-0 shadow-lg mt-4">
                     <h4>Dahboard</h4>
                 </div>
+
+                <div class="row mt-3">
+                    <div class="col-3">
+                        <div class="card p-3 border-0 shadow-lg text-white bg-brown">
+                            <h3>Total Tasker : </h3>
+                            <h1><i class="fa-light fa-user-tie me-2"></i> 1</h1>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card p-3 border-0 shadow-lg text-white bg-brown">
+                            <h3>Total Worker : </h3>
+                            <h1><i class="fa-light fa-user-helmet-safety me-2"></i> 1</h1>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

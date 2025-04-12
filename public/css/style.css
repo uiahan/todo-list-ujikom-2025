@@ -21,3 +21,7 @@ body {
 .border-right-brown {
     border-right: #3D0A05 4px solid !important;
 }
+
+.border-brown {
+    border: #3D0A05 2px solid !important;
+}
