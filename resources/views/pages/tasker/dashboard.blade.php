@@ -18,7 +18,7 @@
                     <div class="col-3">
                         <div class="card p-3 border-0 shadow-lg text-second">
                             <h3>Total Job : </h3>
-                            <h1><i class="fa-regular fa-briefcase me-2"></i> 1</h1>
+                            <h1><i class="fa-light fa-briefcase me-2"></i> 1</h1>
                         </div>
                     </div>
                 </div>
