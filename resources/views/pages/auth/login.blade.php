@@ -44,9 +44,9 @@
                             <small for="checkbox">Remember me</small>
                         </div>
                         <div class="mt-3">
-                            <button class="btn text-white w-100" style="background-color: #914F1E" type="submit">Sign In</button>
+                            <button class="btn text-white w-100 bg-brown" type="submit">Sign In</button>
                             <div class="mt-2">
-                                <small>Belum punya akun? <a href="" style="color: #914F1E">daftar sekarang</a></small>
+                                <small>Belum punya akun? <a href="" class="text-white">daftar sekarang</a></small>
                             </div>
                         </div>
                     </form>
