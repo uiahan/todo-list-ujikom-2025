@@ -6,8 +6,16 @@ body {
     color: #3D0A05 !important;
 }
 
+.bk-brown {
+    background-color: #3D0A05 !important;
+}
+
 .bg-brown {
     background-color: #3D0A05 !important;
+}
+
+.bg-brown:hover {
+    background-color: #690f09 !important;
 }
 
 .bg-first {

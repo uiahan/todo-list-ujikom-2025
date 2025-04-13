@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'admin',
             'username' => 'admin',
             'role' => 'admin',
+            'phone_number' => '089519094253',
             'password' => bcrypt('admin123'),
         ]);
 
@@ -24,6 +25,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'tasker',
             'username' => 'tasker',
             'role' => 'tasker',
+            'phone_number' => '089519094253',
             'password' => bcrypt('tasker123'),
         ]);
 
@@ -31,6 +33,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'worker',
             'username' => 'worker',
             'role' => 'worker',
+            'phone_number' => '089519094253',
             'password' => bcrypt('worker123'),
         ]);
     }

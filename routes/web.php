@@ -22,9 +22,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['can:admin']], function (){
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard.admin');
     Route::group(['prefix' => 'manage-tasker', 'controller' => ManageTaskerController::class], function(){
         Route::get('/', 'index')->name('manage.tasker');
+        Route::get('/tasker-data', 'getTasker')->name('tasker.data');
+        Route::get('/get-data/{id}', 'getData')->name('tasker.show');
+        Route::post('/store-tasker', 'store')->name('store.tasker');
+        Route::put('/update-tasker/{id}', 'update')->name('update.tasker');
+        Route::delete('/delete-tasker/{id}', 'delete')->name('delete.tasker');
     });
     Route::group(['prefix' => 'manage-worker', 'controller' => ManageWorkerController::class], function(){
         Route::get('/', 'index')->name('manage.worker');
+        Route::get('worker-data', 'getWorker')->name('worker.data');
+        Route::post('store-worker', 'store')->name('store.worker');
     });
 });
 

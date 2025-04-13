@@ -2,7 +2,7 @@
     style="width: 250px; height: 94vh;">
     <div class="text-center">
         <a href="/" class="text-second text-decoration-none fs-4 d-block">
-            <i class="fa-regular fa-notebook"></i> Todo List
+            <i class="fa-regular fa-clipboard"></i> Todo List
         </a>
     </div>
     <div class="my-3" style="background-color: #3D0A05; height: 2px;"></div>
