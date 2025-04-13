@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('video')->nullable();
-            $table->string('image');
             $table->text('description')->nullable();
+            $table->string('image')->nullable();
+            $table->string('video')->nullable();
             $table->timestamp('deadline')->nullable();
             $table->string('repetition')->nullable();
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');

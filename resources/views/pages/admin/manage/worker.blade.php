@@ -3,7 +3,8 @@
 
 @push('css')
     <style>
-        #workerTable td, #workerTable th {
+        #workerTable td,
+        #workerTable th {
             text-align: left !important;
         }
     </style>
@@ -18,7 +19,8 @@
                 <div class="card text-second p-3 border-0 shadow-lg mt-4">
                     <div class="d-flex justify-content-between">
                         <h4>Manage Worker</h4>
-                        <button data-bs-toggle="modal" data-bs-target="#addWorkerModal" class="btn bg-brown text-white"><i class="fa-regular fa-plus me-1"></i> Add Worker</button>
+                        <button data-bs-toggle="modal" data-bs-target="#addWorkerModal" class="btn bg-brown text-white"><i
+                                class="fa-regular fa-plus me-1"></i> Add Worker</button>
                     </div>
                     <hr>
                     <table id="workerTable" class="table table-bordered text-second">
@@ -38,7 +40,6 @@
         </div>
     </div>
 
-    {{-- Add Worker Modal --}}
     <div class="modal fade" id="addWorkerModal" tabindex="-1" aria-labelledby="addWorkerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-second">
@@ -78,19 +79,18 @@
         </div>
     </div>
 
-    <!-- Modal Edit Tasker -->
-    <div class="modal fade" id="editTaskerModal" tabindex="-1" aria-labelledby="editTaskerModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editWorkerModal" tabindex="-1" aria-labelledby="editWorkerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-second">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="editTaskerModalLabel">Edit Tasker</h1>
+                    <h1 class="modal-title fs-5" id="editWorkerModalLabel">Edit Worker</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="editTaskerForm" method="POST" enctype="multipart/form-data">
+                <form id="editWorkerForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
-                        <input type="hidden" id="editTaskerId" name="id">
+                        <input type="hidden" id="editWorkerId" name="id">
                         <div class="mb-2">
                             <label class="form-label">Name</label>
                             <input type="text" id="editName" name="name" class="form-control" required>
@@ -113,7 +113,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn bg-brown text-white">Update</button>
+                        <button type="submit" class="btn bg-brown text-white">Save</button>
                     </div>
                 </form>
             </div>
@@ -122,45 +122,154 @@
 @endsection
 
 @push('js')
-<script>
-    $('#workerTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('worker.data') }}",
-        order: [
-            [1, 'desc']
-        ],
-        columns: [{
-                data: 'DT_RowIndex',
-                name: 'DT_RowIndex',
-                orderable: false,
-                searchable: false
-            },
-            {
-                data: 'profile',
-                name: 'profile',
-                orderable: false,
-                searchable: false
-            },
-            {
-                data: 'name',
-                name: 'name'
-            },
-            {
-                data: 'username',
-                name: 'username'
-            },
-            {
-                data: 'phone_number',
-                name: 'phone_number'
-            },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false
-            }
-        ]
-    });
-</script>
+    <script>
+        $('#workerTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('worker.data') }}",
+            order: [
+                [1, 'desc']
+            ],
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'profile',
+                    name: 'profile',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'username',
+                    name: 'username'
+                },
+                {
+                    data: 'phone_number',
+                    name: 'phone_number'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
+
+        function editWorker(id) {
+            let url = '{{ route('worker.show', ':id') }}'.replace(':id', id);
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    $('#editWorkerId').val(response.id);
+                    $('#editName').val(response.name);
+                    $('#editUsername').val(response.username);
+                    $('#editPhoneNumber').val(response.phone_number);
+
+                    let updateUrl = '{{ route('update.worker', ':id') }}'.replace(':id', response.id);
+                    $('#editWorkerForm').attr('action', updateUrl);
+
+                    $('#editWorkerModal').modal('show');
+                },
+                error: function(xhr) {
+                    alert('Gagal ambil data. Cek console.');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+
+        $('#editWorkerForm').on('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                url: $('#editWorkerForm').attr('action'),
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $('#editWorkerModal').modal('hide');
+                    $('#workerTable').DataTable().ajax.reload();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: response.success,
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'btn'
+                        },
+                        buttonsStyling: false,
+                        didOpen: () => {
+                            const swal = Swal.getPopup();
+                            swal.style.color = '#3D0A05';
+
+                            const confirmBtn = swal.querySelector('.btn');
+                            confirmBtn.style.backgroundColor = '#3D0A05';
+                            confirmBtn.style.borderColor = '#3D0A05';
+                            confirmBtn.style.color = 'white';
+                        }
+                    });
+                }
+            });
+        });
+
+        function deleteWorker(id) {
+            Swal.fire({
+                title: 'Yakin mau hapus?',
+                text: "Data tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3D0A05',
+                cancelButtonColor: '#3D0A05',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/manage-worker/delete-worker/' + id,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $('#workerTable').DataTable().ajax.reload();
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Terhapus!',
+                                text: response.success,
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    confirmButton: 'btn'
+                                },
+                                buttonsStyling: false,
+                                didOpen: () => {
+                                    const swal = Swal.getPopup();
+                                    swal.style.color = '#3D0A05';
+
+                                    const confirmBtn = swal.querySelector('.btn');
+                                    confirmBtn.style.backgroundColor = '#3D0A05';
+                                    confirmBtn.style.borderColor = '#3D0A05';
+                                    confirmBtn.style.color = 'white';
+                                }
+                            });
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            Swal.fire('Oops!', 'Gagal menghapus worker.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 @endpush

@@ -40,7 +40,6 @@
         </div>
     </div>
 
-    {{-- Add Tasker Modal --}}
     <div class="modal fade" id="addTaskerModal" tabindex="-1" aria-labelledby="addTaskerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-second">
@@ -80,7 +79,6 @@
         </div>
     </div>
 
-    <!-- Modal Edit Tasker -->
     <div class="modal fade" id="editTaskerModal" tabindex="-1" aria-labelledby="editTaskerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-second">
@@ -115,14 +113,12 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn bg-brown text-white">Update</button>
+                        <button type="submit" class="btn bg-brown text-white">Save</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
-
 @endsection
 
 @push('js')
@@ -166,9 +162,7 @@
                 }
             ]
         });
-    </script>
 
-    <script>
         function editTasker(id) {
             let url = '{{ route('tasker.show', ':id') }}'.replace(':id', id);
 
@@ -192,9 +186,7 @@
                 }
             });
         }
-    </script>
 
-    <script>
         $('#editTaskerForm').on('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(this);
@@ -230,9 +222,7 @@
                 }
             });
         });
-    </script>
 
-    <script>
         function deleteTasker(id) {
             Swal.fire({
                 title: 'Yakin mau hapus?',
@@ -280,6 +270,6 @@
                     });
                 }
             });
-        }
+        }        
     </script>
 @endpush

@@ -1,10 +1,10 @@
 @extends('layouts.page')
 @section('title', 'Dashboard')
+
 @push('css')
-    <style>
-        /* css */
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 @endpush
+
 @section('content')
     <div class="d-flex ps-4 py-4">
         @include('components.sidebar')
@@ -17,16 +17,20 @@
 
                 <div class="row mt-3">
                     <div class="col-3">
-                        <div class="card p-3 border-0 shadow-lg text-white bk-brown">
-                            <h3>Total Tasker : </h3>
-                            <h1><i class="fa-light fa-user-tie me-2"></i> 1</h1>
-                        </div>
+                        <a href="{{ route('manage.tasker') }}" class="text-decoration-none">
+                            <div class="card card-badge p-3 border-0 shadow-lg text-white bk-brown">
+                                <h3>Total Tasker : </h3>
+                                <h1><i class="fa-light fa-user-tie me-2"></i> {{ $taskerCount }}</h1>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-3">
-                        <div class="card p-3 border-0 shadow-lg text-white bk-brown">
-                            <h3>Total Worker : </h3>
-                            <h1><i class="fa-light fa-user-helmet-safety me-2"></i> 1</h1>
-                        </div>
+                        <a href="{{ route('manage.worker') }}" class="text-decoration-none">
+                            <div class="card card-badge p-3 border-0 shadow-lg text-white bk-brown">
+                                <h3>Total Worker : </h3>
+                                <h1><i class="fa-light fa-user-helmet-safety me-2"></i> {{ $workerCount }}</h1>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -43,6 +43,12 @@ class ManageWorkerController extends Controller
         }
     }
 
+    public function getData($id)
+    {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -73,5 +79,38 @@ class ManageWorkerController extends Controller
             $firstError = collect($e->validator->errors()->all())->first();
             return redirect()->back()->with('error', $firstError);
         }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string',
+            'username' => 'required|string|unique:users,username,' . $id,
+            'phone_number' => 'required|string',
+            'password' => 'nullable|string|min:6',
+            'profile' => 'nullable|image|max:2048'
+        ]);
+
+        if ($request->hasFile('profile')) {
+            $path = $request->file('profile')->store('profiles', 'public');
+        }
+
+        $user = User::findOrFail($id);
+        $user->name = $validated['name'];
+        $user->username = $validated['username'];
+        $user->phone_number = $validated['phone_number'];
+        $user->profile = $path ?? $user->profile;
+        $user->password = $request->filled('password') ? Hash::make($validated['password']) : $user->password;
+        $user->save();
+
+        return response()->json(['success' => 'Worker successfully updated.']);
+    }
+
+    public function delete($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(['success' => 'User successfully deleted.']);
     }
 }

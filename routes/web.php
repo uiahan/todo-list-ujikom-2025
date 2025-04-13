@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ManageTaskerController;
 use App\Http\Controllers\Admin\ManageWorkerController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Tasker\ManageJobController;
+use App\Http\Controllers\Tasker\ManageQuestController;
 use App\Http\Controllers\Tasker\TaskerController;
 use App\Http\Controllers\Worker\JobController;
 use App\Http\Controllers\Worker\QuestController;
@@ -30,8 +31,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['can:admin']], function (){
     });
     Route::group(['prefix' => 'manage-worker', 'controller' => ManageWorkerController::class], function(){
         Route::get('/', 'index')->name('manage.worker');
-        Route::get('worker-data', 'getWorker')->name('worker.data');
-        Route::post('store-worker', 'store')->name('store.worker');
+        Route::get('/worker-data', 'getWorker')->name('worker.data');
+        Route::get('/get-data/{id}', 'getData')->name('worker.show');
+        Route::post('/store-worker', 'store')->name('store.worker');
+        Route::put('/update-worker/{id}', 'update')->name('update.worker');
+        Route::delete('/delete-worker/{id}', 'delete')->name('delete.worker');
     });
 });
 
@@ -39,7 +43,12 @@ Route::group(['prefix' => 'tasker', 'middleware' => ['can:tasker']], function ()
     Route::get('/dashboard', [TaskerController::class, 'dashboard'])->name('dashboard.tasker');
     Route::group(['prefix' => 'manage-job', 'controller' => ManageJobController::class], function(){
         Route::get('/', 'index')->name('manage.job');
+        Route::post('/store-job', 'store')->name('store.job');
         Route::get('/view-job', 'viewJob')->name('view.job');
+    });
+    Route::group(['prefix' => 'manage-quest', 'controller' => ManageQuestController::class], function(){
+        Route::post('/store-quest', 'store')->name('store.quest');
+        Route::get('/quest/{task}', 'getQuest')->name('get.quest');
     });
 });
 
