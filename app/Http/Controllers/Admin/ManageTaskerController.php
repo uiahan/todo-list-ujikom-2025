@@ -39,7 +39,7 @@ class ManageTaskerController extends Controller
                         </button>
                     ';
                 })
-                
+
                 ->rawColumns(['profile', 'action'])
                 ->make(true);
         }
@@ -61,12 +61,12 @@ class ManageTaskerController extends Controller
                 'password' => 'required|string|min:6',
                 'profile' => 'nullable|image|max:2048'
             ]);
-    
+
             $path = null;
             if ($request->hasFile('profile')) {
                 $path = $request->file('profile')->store('profiles', 'public');
             }
-    
+
             User::create([
                 'name' => $validated['name'],
                 'username' => $validated['username'],
@@ -75,7 +75,7 @@ class ManageTaskerController extends Controller
                 'profile' => $path,
                 'role' => 'tasker',
             ]);
-            
+
             return redirect()->back()->with('success', 'Tasker successfully added.');
         } catch (ValidationException $e) {
             $firstError = collect($e->validator->errors()->all())->first();

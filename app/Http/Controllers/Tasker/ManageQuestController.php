@@ -32,4 +32,15 @@ class ManageQuestController extends Controller
         $quests = $task->subtasks;
         return response()->json($quests);
     }
+
+    public function delete($id)
+    {
+        $quest = Subtask::findOrFail($id);
+        $quest->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Quest successfully deleted.'
+        ]);
+    }
 }

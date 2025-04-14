@@ -36,7 +36,7 @@
             <small class="text-second ms-1 mb-1">Menu</small>
             <li class="nav-item {{ request()->routeIs('manage.job') ? 'active-nav-link' : '' }}">
                 <a href="{{ route('manage.job') }}" class="nav-link text-second">
-                    <i class="fa-regular fa-briefcase me-2"></i> My Job
+                    <i class="fa-regular fa-briefcase me-2"></i> Jobs
                 </a>
             </li>
             <li class="nav-item">
