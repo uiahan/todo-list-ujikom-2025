@@ -15,48 +15,46 @@
                     <div class="d-flex justify-content-between">
                         <h4>My Job</h4>
                         <button class="btn bg-brown text-white" data-bs-toggle="modal" data-bs-target="#addJobModal"><i
-                            class="fa-regular fa-plus me-1"></i> Add New Job</button>
+                                class="fa-regular fa-plus me-1"></i> Add New Job</button>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-6">
-                        <div class="card w-100 mb-3 mt-3 border-0 shadow text-white" style="background-color: #3D0A05;">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <div class="ratio ratio-4x3 h-100 rounded-start overflow-hidden">
-                                        <img src="{{ asset('images/ujikom.jpg') }}" alt=""
-                                            style="object-fit: cover">
+                    @foreach ($taskWorkers as $item)
+                        <div class="col-6">
+                            <div class="card w-100 mb-3 mt-3 border-0 shadow text-white" style="background-color: #3D0A05;">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <div class="ratio ratio-4x3 h-100 rounded-start overflow-hidden">
+                                            <img src="{{ asset('storage/' . $item->task->image) }}" alt=""
+                                                style="object-fit: cover">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between">
-                                            <h5 class="card-title mb-1"><i class="fa-regular fa-clipboard me-1"></i> Ujikom
-                                            </h5>
-                                            <div class="mb-3">
-                                                <span class="badge bg-primary text-white">On Progress</span>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <h5 class="card-title mb-1">
+                                                    {{ $item->task->title }}
+                                                </h5>
+                                                <div class="mb-3">
+                                                    <span class="badge bg-primary text-white">On Progress</span>
+                                                </div>
                                             </div>
+                                            <p class="card-text small mb-2">{{ Str::limit($item->task->description, 80, '...') }}</p>
+                                            <p class="card-text mb-2"><small>📅 <span class="fw-bold">Deadline :</span> {{ $item->task->deadline ? \Carbon\Carbon::parse($item->deadline)->format('Y-m-d') : 'Tidak ada deadline' }}</small></p>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-success" style="width: 45%;" aria-valuenow="45"
+                                                    aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <a href="{{ route('quest', $item->task->id) }}"
+                                                class="btn btn-light text-second d-block fw-bold btn-sm mt-3"
+                                                style="font-size: 11px">Start Job</a>
                                         </div>
-                                        <p class="card-text small mb-2">This is a wider card with supporting text below as a
-                                            natural lead-in to
-                                            additional content. This content is a little bit longer.</p>
-
-                                        <p class="card-text mb-2"><small>📅 <span class="fw-bold">Deadline :</span> 12
-                                                September 2025</small></p>
-                                        <div class="progress" style="height: 8px;">
-                                            <div class="progress-bar bg-success" style="width: 45%;" aria-valuenow="45"
-                                                aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                        <a href="{{ route('quest') }}"
-                                            class="btn btn-light text-second d-block fw-bold btn-sm mt-3"
-                                            style="font-size: 11px">Start Job</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    @endforeach
                 </div>
             </div>
         </div>

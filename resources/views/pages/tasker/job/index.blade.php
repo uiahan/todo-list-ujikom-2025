@@ -3,7 +3,11 @@
 
 @push('css')
     <style>
-        /* css */
+        .btn-light {
+            padding-left: 10px;
+            padding-right: 10px;
+            min-width: 40px;
+        }
     </style>
 @endpush
 
@@ -13,58 +17,73 @@
         <div style="padding-left: 270px" class="w-100">
             <div class="pe-4">
                 @include('components.navbar')
-                <div class="card text-second p-3 border-0 shadow-lg mt-4">
+                <div class="text-second border-left-brown card px-3 pt-3 pb-2 border-0 shadow-lg mt-4">
                     <div class="d-flex justify-content-between">
                         <h4>My Job</h4>
                         <button data-bs-toggle="modal" data-bs-target="#addJobModal" data-bs-title="Add Job"
-                            class="btn bg-brown text-white"><i class="fa-regular fa-plus"></i></button>
+                            class="btn bg-brown text-white"><i class="fa-regular fa-plus me-1"></i> Add New Job</button>
                     </div>
-                    <hr>
-                    <table class="table table-bordered text-second" id="jobTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Image</th>
-                                <th>Job Name</th>
-                                <th>Deadline</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($task as $item)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td><img src="{{ asset('storage/' . $item->image) }}" width="40" height="40"
-                                            style="object-fit: cover" alt=""></td>
-                                    <td>{{ $item->title }}</td>
-                                    <td>
-                                        {{ $item->deadline ? \Carbon\Carbon::parse($item->deadline)->format('Y-m-d') : 'Tidak ada deadline' }}
-                                    </td>
-                                    <td>
-                                        <button class="btn bg-brown text-white open-quest-modal" data-bs-toggle="modal"
-                                            data-bs-target="#questModal" data-task-id="{{ $item->id }}"
-                                            data-task-title="{{ $item->title }}">
-                                            <i class="fa-regular fa-note"></i>
-                                        </button>
-                                        <a href="{{ route('view.worker', $item->id) }}" class="btn bg-brown text-white btn-open-worker-modal" data-bs-title="Worker"><i class="fa-regular fa-users"></i></a>
-                                        <button class="btn bg-brown text-white btn-edit-tasker" data-bs-toggle="modal"
-                                            data-bs-target="#editJobModal" data-id="{{ $item->id }}"
-                                            data-title="{{ $item->title }}" data-description="{{ $item->description }}"
-                                            data-image="{{ $item->image }}" data-video="{{ $item->video }}"
-                                            data-deadline="{{ $item->deadline }}"
-                                            data-repetition="{{ $item->repetition }}">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </button>
+                </div>
+                <div class="row">
+                    @foreach ($task as $item)
+                        <div class="col-6">
+                            <div class="card w-100 mb-3 mt-3 border-0 shadow text-white" style="background-color: #3D0A05;">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <div class="ratio ratio-4x3 h-100 rounded-start overflow-hidden">
+                                            <img src="{{ asset('storage/' . $item->image) }}" alt=""
+                                                style="object-fit: cover">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <h5 class="card-title mb-1">{{ $item->title }}
+                                                </h5>
+                                                <div class="mb-3">
+                                                    <span class="badge bg-primary text-white">On Progress</span>
+                                                </div>
+                                            </div>
+                                            <p class="card-text small mb-2">
+                                                {{ Str::limit($item->description, 80, '...') }}
+                                            </p>
+                                            <p class="card-text mb-2"><small>📅 <span class="fw-bold">Deadline :</span>
+                                                    {{ $item->deadline ? \Carbon\Carbon::parse($item->deadline)->format('Y-m-d') : 'Tidak ada deadline' }}</small>
+                                            </p>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-success" style="width: 45%;" aria-valuenow="45"
+                                                    aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="d-flex mt-3">
+                                                <button class="btn btn-light open-quest-modal me-1" data-bs-toggle="modal"
+                                                    data-bs-target="#questModal" data-task-id="{{ $item->id }}"
+                                                    data-task-title="{{ $item->title }}" data-bs-title="Quest">
+                                                    <i class="fa-regular fa-note"></i>
+                                                </button>
+                                                <a href="{{ route('view.worker', $item->id) }}"
+                                                    class="btn me-1 btn-light btn-open-worker-modal"
+                                                    data-bs-title="Worker"><i class="fa-regular fa-users"></i></a>
+                                                <button class="btn btn-light btn-edit-tasker" data-bs-toggle="modal"
+                                                    data-bs-target="#editJobModal" data-id="{{ $item->id }}"
+                                                    data-title="{{ $item->title }}"
+                                                    data-description="{{ $item->description }}"
+                                                    data-image="{{ $item->image }}" data-video="{{ $item->video }}"
+                                                    data-deadline="{{ $item->deadline }}"
+                                                    data-repetition="{{ $item->repetition }}" data-bs-title="Edit">
+                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                </button>
 
-                                        <button class="btn bg-brown text-white btn-delete-tasker"
-                                            data-id="{{ $item->id }}" data-title="{{ $item->title }}">
-                                            <i class="fa-regular fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                                <button class="btn btn-light btn-delete-tasker ms-1" data-bs-title="Delete"
+                                                    data-id="{{ $item->id }}" data-title="{{ $item->title }}">
+                                                    <i class="fa-regular fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -382,70 +401,64 @@
             });
         </script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const taskTable = document.querySelector('table');
-                const dataTable = $('#taskerTable').DataTable();
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', function (e) {
+            const deleteBtn = e.target.closest('.btn-delete-tasker');
+            if (!deleteBtn) return;
 
-                taskTable.addEventListener('click', function(e) {
-                    const deleteBtn = e.target.closest('.btn-delete-tasker');
-                    if (!deleteBtn) return;
+            const taskId = deleteBtn.dataset.id;
+            const taskTitle = deleteBtn.dataset.title;
 
-                    const taskId = deleteBtn.dataset.id;
-                    const taskTitle = deleteBtn.dataset.title;
-
-                    Swal.fire({
-                        title: `Hapus "${taskTitle}"?`,
-                        text: "Data ini akan hilang permanen.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3D0A05',
-                        cancelButtonColor: '#3D0A05',
-                        confirmButtonText: 'Ya, hapus!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: '/tasker/manage-job/delete-job/' + taskId,
-                                type: 'DELETE',
-                                data: {
-                                    _token: '{{ csrf_token() }}'
+            Swal.fire({
+                title: `Hapus "${taskTitle}"?`,
+                text: "Data ini akan hilang permanen.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3D0A05',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/tasker/manage-job/delete-job/' + taskId,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Terhapus!',
+                                text: response.success || 'Tasker berhasil dihapus.',
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    confirmButton: 'btn'
                                 },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Terhapus!',
-                                        text: response.success ||
-                                            'Tasker berhasil dihapus.',
-                                        confirmButtonText: 'OK',
-                                        customClass: {
-                                            confirmButton: 'btn'
-                                        },
-                                        buttonsStyling: false,
-                                        didOpen: () => {
-                                            const swal = Swal.getPopup();
-                                            swal.style.color = '#3D0A05';
-                                            const confirmBtn = swal
-                                                .querySelector('.btn');
-                                            confirmBtn.style.backgroundColor =
-                                                '#3D0A05';
-                                            confirmBtn.style.borderColor =
-                                                '#3D0A05';
-                                            confirmBtn.style.color = 'white';
-                                        }
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-                                },
-                                error: function(xhr) {
-                                    console.error(xhr.responseText);
-                                    Swal.fire('Oops!', 'Gagal menghapus job.', 'error');
+                                buttonsStyling: false,
+                                didOpen: () => {
+                                    const swal = Swal.getPopup();
+                                    swal.style.color = '#3D0A05';
+                                    const confirmBtn = swal.querySelector('.btn');
+                                    confirmBtn.style.backgroundColor = '#3D0A05';
+                                    confirmBtn.style.borderColor = '#3D0A05';
+                                    confirmBtn.style.color = 'white';
                                 }
+                            }).then(() => {
+                                location.reload();
                             });
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            Swal.fire('Oops!', 'Gagal menghapus job.', 'error');
                         }
                     });
-                });
+                }
             });
-        </script>
+        });
+    });
+</script>
+
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {

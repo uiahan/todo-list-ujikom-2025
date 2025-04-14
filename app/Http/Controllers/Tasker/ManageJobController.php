@@ -19,17 +19,19 @@ class ManageJobController extends Controller
         return view('pages.tasker.job.index', compact('user', 'task'));
     }
 
-    public function viewWorker(Task $task) {
+    public function viewWorker(Task $task)
+    {
         $user = Auth::user();
         $worker = User::where('role', 'worker')->get();
         $taskWorker = TaskWorker::where('task_id', $task->id)->with('worker')->get();
         return view('pages.tasker.job.worker-task', compact('user', 'worker', 'taskWorker', 'task'));
     }
 
-    public function viewJob()
+    public function viewJob(Task $task, User $worker)
     {
+        $quest = $task->subtasks; // Ini semua subtasks
         $user = Auth::user();
-        return view('pages.tasker.job.view-job', compact('user'));
+        return view('pages.tasker.job.view-job', compact('user', 'quest', 'task', 'worker'));
     }
 
     public function store(Request $request)
@@ -108,19 +110,38 @@ class ManageJobController extends Controller
     {
         try {
             $validated = $request->validate([
-                'task_id' => 'required',
-                'worker_id' => 'required',
+                'task_id' => 'required|exists:tasks,id',
+                'worker_id' => 'required|exists:users,id',
             ]);
 
+            // Cek apakah kombinasi task_id dan worker_id sudah ada
+            $exists = TaskWorker::where('task_id', $validated['task_id'])
+                ->where('worker_id', $validated['worker_id'])
+                ->exists();
+
+            if ($exists) {
+                return redirect()->back()->with('error', 'Worker sudah terdaftar pada task ini.');
+            }
+
+            // Simpan jika belum ada
             TaskWorker::create([
                 'task_id' => $validated['task_id'],
                 'worker_id' => $validated['worker_id'],
             ]);
 
-            return redirect()->back()->with('success', 'Worker assign successfully added.');
+            return redirect()->back()->with('success', 'Worker berhasil ditambahkan.');
         } catch (ValidationException $e) {
             $firstError = collect($e->validator->errors()->all())->first();
             return redirect()->back()->with('error', $firstError);
         }
+    }
+
+
+    public function deleteWorker($id)
+    {
+        $worker = TaskWorker::find($id);
+        $worker->delete();
+
+        return redirect()->back()->with('success', 'Worker successfully removed.');
     }
 }

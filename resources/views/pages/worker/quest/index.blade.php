@@ -14,7 +14,7 @@
 
                 <div class="text-second border-left-brown card px-3 pt-3 pb-3 border-0 shadow-lg mt-4">
                     <div class="d-flex justify-content-between">
-                        <h4 class="mt-1">Job Title : Ujikom</h4>
+                        <h4 class="mt-1">Job Title : {{ $task->title }}</h4>
                         <button class="btn bg-brown text-white" data-bs-toggle="modal" data-bs-target="#questModal"><i
                                 class="fa-regular fa-plus me-1"></i> Add Quest</button>
                     </div>
@@ -36,7 +36,7 @@
                                     to</label>
                                 <p class="mb-3">
                                     <small>
-                                        Farhan
+                                        {{ $user->name }}
                                     </small>
                                 </p>
                             </div>
@@ -45,7 +45,7 @@
                                     Deadline</label>
                                 <p class="mb-3">
                                     <small>
-                                        15 April 2025
+                                        {{ $task->deadline ? \Carbon\Carbon::parse($task->deadline)->format('Y-m-d') : 'Tidak ada deadline' }}
                                     </small>
                                 </p>
                             </div>
@@ -54,11 +54,7 @@
                                     Description</label>
                                 <p class="mb-3 text-sm">
                                     <small>
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio qui officiis laborum
-                                        illum
-                                        id, voluptate magnam in dolorum aliquam, suscipit ex nisi possimus itaque rerum
-                                        totam
-                                        perferendis eum corporis eligendi? lorem
+                                        {{ Str::limit($task->description, 80, '...') }}
                                     </small>
                                 </p>
                             </div>
@@ -79,9 +75,8 @@
                         <div class="card border-0 shadow p-3">
                             <h4>Video Tutorial</h4>
                             <div style="background-color: #3D0A05; height: 1px;" class="mt-2 mb-3"></div>
-                            <iframe width="540" height="315"
-                                src="https://www.youtube.com/embed/tC1gFUR0S3Y?si=RPP7bM049WHuEiO6"
-                                title="YouTube video player" frameborder="0"
+                            <iframe width="540" height="315" src="{{ $task->video }}" title="YouTube video player"
+                                frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                         </div>
@@ -93,18 +88,32 @@
                         <div class="card p-3 border-0 shadow" style="min-height: 50vh">
                             <h4 class="text-center"><i class="fa-regular fa-clock"></i> Pending</h4>
                             <div style="background-color: #3D0A05; height: 2px;" class="mt-2"></div>
-                            <div class="card border-brown p-2" style="margin-top: 1rem">
-                                <div class="d-flex justify-content-between">
-                                    <h6>Membuat rancangan web</h6>
-                                    <div>
-                                        <button data-bs-toggle="tooltip" class="btn btn-sm bg-brown text-white"
-                                            data-bs-title="Start"><i class="fa-solid fa-check"></i></button>
-                                        <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
-                                            class="btn btn-sm bg-brown text-white" data-bs-title="Detail"><i
-                                                class="fa-solid fa-bars"></i></button>
+                            @foreach ($subtasks as $item)
+                                <div class="card border-brown p-2" style="margin-top: 1rem">
+                                    <div class="d-flex justify-content-between">
+                                        <h6>{{ $item->title }}</h6>
+                                        <div>
+                                            <form action="{{ route('quest.progress') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="subtask_id" value="{{ $item->id }}">
+                                                <input type="hidden" name="worker_id" value="{{ auth()->id() }}">
+                                                <input type="hidden" name="status" value="in_progres">
+                                                <div class="d-flex">
+                                                    <button type="submit" class="btn btn-sm bg-brown text-white me-1"
+                                                        data-bs-title="Start">
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </button>
+
+                                                    <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
+                                                        class="btn btn-sm bg-brown text-white" data-bs-title="Detail"><i
+                                                            class="fa-solid fa-bars"></i></button>
+                                                </div>
+                                            </form>
+
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 
@@ -113,40 +122,64 @@
                             style="min-height: 50vh; background-color: #3D0A05;">
                             <h4 class="text-center"><i class="fa-regular fa-play"></i> In Progress</h4>
                             <div style="background-color: #fff; height: 2px;" class="mt-2"></div>
-                            <div class="card border-brown p-2" style="margin-top: 1rem">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="text-second">Membuat design</h6>
-                                    <div>
-                                        <button data-bs-toggle="tooltip" class="btn btn-sm bg-brown text-white"
-                                            data-bs-title="Cancel"><i class="fa-solid fa-xmark"></i></button>
-                                        <button data-bs-toggle="modal" data-bs-target="#uploadPhotoModal"
-                                            class="btn btn-sm bg-brown text-white" data-bs-title="Done"><i
-                                                class="fa-solid fa-check"></i></button>
-                                        <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
-                                            class="btn btn-sm bg-brown text-white" data-bs-title="Detail"><i
-                                                class="fa-solid fa-bars"></i></button>
+
+                            @foreach ($inProgress as $item)
+                                <div class="card border-brown p-2" style="margin-top: 1rem">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="text-second">{{ $item->title }}</h6>
+                                        <div>
+                                            <form action="{{ route('quest.cancel') }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="subtask_id" value="{{ $item->id }}">
+                                                <input type="hidden" name="worker_id" value="{{ auth()->id() }}">
+                                                <button type="submit" class="btn btn-sm bg-brown text-white"
+                                                    data-bs-toggle="tooltip" data-bs-title="Cancel">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </form>
+
+                                            <button data-bs-toggle="modal" data-subtask-id="{{ $item->id }}"
+                                                data-worker-id="{{ auth()->id() }}" data-bs-target="#uploadPhotoModal"
+                                                class="btn btn-sm bg-brown text-white" data-bs-title="Done">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                            <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
+                                                class="btn btn-sm bg-brown text-white" data-bs-title="Detail">
+                                                <i class="fa-solid fa-bars"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
+
 
                     <div class="col-3">
                         <div class="card p-3 border-0 shadow" style="min-height: 50vh">
                             <h4 class="text-center"><i class="fa-regular fa-eye"></i> In Review</h4>
                             <div style="background-color: #3D0A05; height: 2px;" class="mt-2"></div>
-                            <div class="card border-brown p-2" style="margin-top: 1rem">
-                                <div class="d-flex justify-content-between">
-                                    <h6>Membuat rancangan web</h6>
-                                    <div>
-                                        <button data-bs-toggle="tooltip" class="btn btn-sm bg-brown text-white"
-                                            data-bs-title="Cancel"><i class="fa-solid fa-xmark"></i></button>
-                                        <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
-                                            class="btn btn-sm bg-brown text-white" data-bs-title="Detail"><i
-                                                class="fa-solid fa-bars"></i></button>
+                            @foreach ($inReview as $item)
+                                <div class="card border-brown p-2" style="margin-top: 1rem">
+                                    <div class="d-flex justify-content-between">
+                                        <h6>{{ $item->title }}</h6>
+                                        <div>
+                                            @if ($item->subtaskWorker && $item->subtaskWorker->image)
+                                                <img src="{{ asset('storage/' . $item->subtaskWorker->image) }}"
+                                                    alt="Photo" width="100" height="100">
+                                            @endif
+                                            <button data-bs-toggle="tooltip" class="btn btn-sm bg-brown text-white"
+                                                data-bs-title="Cancel">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                            <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
+                                                class="btn btn-sm bg-brown text-white" data-bs-title="Detail">
+                                                <i class="fa-solid fa-bars"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 
@@ -155,18 +188,25 @@
                             style="min-height: 50vh; background-color: #3D0A05;">
                             <h4 class="text-center"><i class="fa-solid fa-check"></i> Done</h4>
                             <div style="background-color: #fff; height: 2px;" class="mt-2"></div>
-                            <div class="card border-brown p-2" style="margin-top: 1rem">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="text-second">Membuat rancangan web</h6>
-                                    <div>
-                                        <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
-                                            class="btn btn-sm bg-brown text-white" data-bs-title="Detail"><i
-                                                class="fa-solid fa-bars"></i></button>
+
+                            @forelse ($done as $item)
+                                <div class="card border-brown p-2" style="margin-top: 1rem">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="text-second">{{ $item->title }}</h6>
+                                        <div>
+                                            <button data-bs-toggle="modal" data-bs-target="#detailQuestModal"
+                                                class="btn btn-sm bg-brown text-white" data-bs-title="Detail">
+                                                <i class="fa-solid fa-bars"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @empty
+                                <p class="text-white mt-3">Belum ada tugas yang selesai 😴</p>
+                            @endforelse
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -199,7 +239,7 @@
         </div>
     </div>
 
-    {{-- upload photo modal --}}
+    {{-- Upload Photo Modal --}}
     <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel"
         aria-hidden="true">
         <div class="modal-dialog text-second modal-dialog-centered">
@@ -209,19 +249,22 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="" method="POST">
-                        <div>
-                            <label for="photo">Photo</label>
-                            <input type="file" accept="image/*" name="photo" required class="form-control">
-                        </div>
+                    <form action="{{ route('quest.updateToReview') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="subtask_id" id="modal-subtask-id">
+                        <input type="hidden" name="worker_id" id="modal-worker-id">
+
+                        <label for="description">Upload Foto Bukti</label>
+                        <input type="file" class="form-control" name="photo" required>
+
+                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-brown text-white">Submit</button>
+
                 </div>
             </div>
         </div>
     </div>
+
 
     {{-- quest modal --}}
     <div class="modal fade" id="questModal" tabindex="-1" aria-labelledby="questModalLabel" aria-hidden="true">
@@ -293,5 +336,20 @@
     <script>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviewModal = document.getElementById('uploadPhotoModal');
+
+            reviewModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const subtaskId = button.getAttribute('data-subtask-id');
+                const workerId = button.getAttribute('data-worker-id');
+
+                // Isi hidden input
+                reviewModal.querySelector('#modal-subtask-id').value = subtaskId;
+                reviewModal.querySelector('#modal-worker-id').value = workerId;
+            });
+        });
     </script>
 @endpush

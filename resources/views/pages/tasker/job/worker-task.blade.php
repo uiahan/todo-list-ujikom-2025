@@ -18,7 +18,7 @@
                 @include('components.navbar')
                 <div class="card text-second p-3 border-0 shadow-lg mt-4">
                     <div class="d-flex justify-content-between">
-                        <h4>Add Worker</h4>
+                        <h4>Add worker for {{ $task->title }}</h4>
                     </div>
                     <form action="{{ route('store.job.worker') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -29,7 +29,7 @@
                                     <option value="{{ $item->id }}">{{ $item->name }}</option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="btn bg-brown text-white">
+                            <button type="submit" class="btn bg-brown text-white" data-bs-title="Add Worker">
                                 <i class="fa-regular fa-plus"></i>
                             </button>
                         </div>
@@ -63,12 +63,15 @@
                                     <td>{{ $item->worker->username }}</td>
                                     <td>{{ $item->worker->phone_number }}</td>
                                     <td>
-                                        <a href="{{ route('view.job') }}" class="btn bg-brown text-white"
+                                        <form action="{{ route('delete.job.worker', $item->id) }}" method="POST" onsubmit="return confirm('Yakin mau hapus?')">
+                                        <a href="{{ route('view.job', ['task' => $task->id, 'worker' => $item->worker->id]) }}" class="btn bg-brown text-white"
                                     data-bs-title="View"><i class="fa-regular fa-eye"></i></a>
-                                        <a href="" class="btn bg-brown text-white"
-                                            onclick="return confirm('Yakin ingin menghapus worker ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn bg-brown text-white" data-bs-title="Delete">
                                             <i class="fa-regular fa-trash"></i>
-                                        </a>
+                                        </button>
+                                    </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -79,62 +82,6 @@
         </div>
     </div>
 @endsection
-
-{{-- <div class="modal fade" id="workerModal" tabindex="-1" aria-labelledby="workerModalLabel" aria-hidden="true">
-    <div class="modal-dialog text-second modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="workerModalLabel">Ujikom</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('store.job.worker') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <label class="mb-1">Add Worker</label>
-                    <div class="input-group">
-                        <input type="text" name="task_id" id="worker-task-id">
-                        <select id="worker-select" name="worker_id" class="form-control">
-                            @foreach ($worker as $item)
-                                <option value="{{ $item->id }}">{{ $item->name }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn bg-brown text-white">
-                            <i class="fa-regular fa-plus"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <hr>
-            <div class="pt-2 px-3 pb-3">
-                <h1 class="modal-title fs-5 mb-1">Worker List</h1>
-                <table class="table table-bordered text-second">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Photo</th>
-                            <th>Name</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td class="text-center"><img src="{{ asset('images/profile.jpg') }}" width="40"
-                                    alt=""></td>
-                            <td>Farhan Dika</td>
-                            <td>
-                                <a href="{{ route('view.job') }}" class="btn bg-brown text-white"
-                                    data-bs-title="View"><i class="fa-regular fa-eye"></i></a>
-                                <button class="btn bg-brown text-white" data-bs-toggle="tooltip"
-                                    data-bs-title="Delete"><i class="fa-regular fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div> --}}
 
 @push('js')
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
@@ -152,6 +99,10 @@
                     return '<div class="no-results">No worker found</div>';
                 }
             }
+        });
+
+        document.querySelectorAll('[data-bs-title]').forEach(el => {
+            new bootstrap.Tooltip(el);
         });
     </script>
 @endpush

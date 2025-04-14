@@ -10,6 +10,16 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
+    public function taskWorkers()
+    {
+        return $this->hasMany(TaskWorker::class, 'worker_id');
+    }
+
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_workers', 'worker_id', 'task_id')
+            ->withTimestamps();
+    }
 
     /**
      * The attributes that are mass assignable.

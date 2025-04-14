@@ -43,15 +43,18 @@ Route::group(['prefix' => 'tasker', 'middleware' => ['can:tasker']], function ()
     Route::get('/dashboard', [TaskerController::class, 'dashboard'])->name('dashboard.tasker');
     Route::group(['prefix' => 'manage-job', 'controller' => ManageJobController::class], function(){
         Route::get('/', 'index')->name('manage.job');
-        Route::get('/view-job', 'viewJob')->name('view.job');
+        Route::get('/view-job/{task}/worker/{worker}', 'viewJob')->name('view.job');
         Route::get('/view-worker/{task}', 'viewWorker')->name('view.worker');
         Route::post('/store-job', 'store')->name('store.job');
         Route::post('/store-worker', 'storeWorker')->name('store.job.worker');
+        Route::delete('/delete-worker/{id}', 'deleteWorker')->name('delete.job.worker');
         Route::put('/update-job/{id}', 'update')->name('update.job');
         Route::delete('/delete-job/{id}', 'delete')->name('delete.job');
     });
     Route::group(['prefix' => 'manage-quest', 'controller' => ManageQuestController::class], function(){
         Route::post('/store-quest', 'store')->name('store.quest');
+        Route::post('/approve-quest', 'approve')->name('quest.approve');
+        Route::post('/reject-quest', 'reject')->name('quest.reject');
         Route::get('/quest/{task}', 'getQuest')->name('get.quest');
         Route::delete('/delete-quest/{id}', 'delete')->name('delete.quest');
     });
@@ -63,6 +66,9 @@ Route::group(['prefix' => 'worker', 'middleware' => ['can:worker']], function ()
         Route::get('/', 'index')->name('job');
     });
     Route::group(['prefix' => 'quest-list', 'controller' => QuestController::class], function() {
-        Route::get('/', 'index')->name('quest');
+        Route::get('/{task}', 'index')->name('quest');
+        Route::post('/quest/progress', 'questProgress')->name('quest.progress');
+        Route::post('/quest/cancel', 'cancel')->name('quest.cancel'); 
+        Route::post('/quest/review', 'updateToReview')->name('quest.updateToReview'); 
     });
 });

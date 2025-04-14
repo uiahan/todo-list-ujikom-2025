@@ -13,9 +13,11 @@
                 @include('components.navbar')
                 <div class="card text-second p-3 border-0 shadow-lg mt-4">
                     <div class="d-flex justify-content-between">
-                        <h4>Farhan Dika Ujikom</h4>
-                        <button data-bs-toggle="modal" data-bs-target="#addJobModal" data-bs-title="Add Job"
-                            class="btn btn-primary"><i class="fa-regular fa-plus"></i></button>
+                        <h4>{{ $task->title }} : {{ $worker->name }}</h4>
+                        <a href="javascript:void(0)" data-bs-title="Back" onclick="location.href = document.referrer"
+                            class="btn bg-brown text-white">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
                     </div>
                     <hr>
                     <table class="table table-bordered text-second" id="jobTable">
@@ -29,25 +31,59 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Ujikom</td>
-                                <td>
-                                    <p class="btn btn-sm btn-danger">Pending</p>
-                                </td>
-                                <td>
-                                    <a href="" class="btn btn-primary" data-bs-title="Image"><i
-                                            class="fa-regular fa-image"></i></a>
-                                </td>
-                                <td>
-                                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#acceptModal" data-bs-title="Accept"><i
-                                            class="fa-solid fa-check"></i></button>
-                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal" data-bs-title="Reject"><i
-                                            class="fa-solid fa-xmark"></i></button>
-                                </td>
-                            </tr>
+                            @foreach ($quest as $item)
+                                @php
+                                    $statusData = $item->subtaskWorkers->where('worker_id', $worker->id)->first();
+                                @endphp
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $item->title }}</td>
+                                    <td>
+                                        @php
+                                            if (!$statusData) {
+                                                $status = 'pending';
+                                            } else {
+                                                $status = $statusData->status;
+                                            }
+
+                                            $badgeClass = match ($status) {
+                                                'pending' => 'danger',
+                                                'in_progres' => 'warning',
+                                                'review' => 'primary',
+                                                'done' => 'success',
+                                                default => 'secondary',
+                                            };
+                                        @endphp
+
+                                        <span class="badge bg-{{ $badgeClass }} text-uppercase">{{ $status }}</span>
+                                    </td>
+                                    <td>
+                                        @if ($statusData && $statusData->image)
+                                            <a href="{{ asset('storage/' . $statusData->image) }}" target="_blank"
+                                                class="btn bg-brown text-white" data-bs-title="Image">
+                                                <i class="fa-regular fa-image"></i>
+                                            </a>
+                                        @else
+                                            <span class="text-muted">Not uploaded yet</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($statusData && $statusData->status === 'review')
+                                            <button class="btn bg-brown text-white" data-bs-toggle="modal"
+                                                data-bs-target="#acceptModal" data-bs-title="Accept">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                            <button class="btn bg-brown text-white" data-bs-toggle="modal"
+                                                data-bs-target="#rejectModal" data-bs-title="Reject">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
+
                 </div>
             </div>
         </div>
@@ -62,16 +98,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('quest.approve') }}" method="POST">
                         @csrf
-                        <div>
-                            <label for="description">Comment this task</label>
-                            <textarea required type="text" class="form-control" name="description"></textarea>
-                        </div>
+                        <input type="text" name="subtask_id" value="{{ $item->id }}">
+                        <input type="text" name="worker_id" value="{{ $worker->id }}">
+                        <label for="">Insert comment</label>
+                        <textarea name="description" required class="form-control"></textarea>
+                        <button type="submit" class="btn bg-brown text-white mt-2">Submit</button>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success">Submit</button>
                 </div>
             </div>
         </div>
@@ -86,16 +120,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('quest.reject') }}" method="POST">
                         @csrf
-                        <div>
-                            <label for="description">Comment this task</label>
-                            <textarea required type="text" class="form-control" name="description"></textarea>
-                        </div>
+                        <input type="hidden" name="subtask_id" value="{{ $item->id }}">
+                        <input type="hidden" name="worker_id" value="{{ $worker->id }}">
+                        <label for="">Insert comment</label>
+                        <textarea name="description" required class="form-control"></textarea>
+                        <button type="submit" class="btn bg-brown text-white mt-2">Submit</button>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger">Submit</button>
+
                 </div>
             </div>
         </div>
@@ -134,6 +167,18 @@
                     return '<div class="no-results">No worker found</div>';
                 }
             }
+        });
+    </script>
+    <script>
+        document.querySelectorAll('[data-bs-target="#acceptModal"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('approve_subtask_id').value = btn.dataset.subtaskId;
+            });
+        });
+        document.querySelectorAll('[data-bs-target="#rejectModal"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('reject_subtask_id').value = btn.dataset.subtaskId;
+            });
         });
     </script>
 @endpush

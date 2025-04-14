@@ -13,4 +13,22 @@ class Subtask extends Model
     {
         return $this->belongsTo(Task::class);
     }
+
+    public function workers()
+    {
+        return $this->belongsToMany(User::class, 'subtask_workers')
+            ->withPivot('status', 'description')
+            ->withTimestamps();
+    }
+
+    public function subtaskWorkers()
+    {
+        return $this->hasMany(SubtaskWorker::class);
+    }
+
+    public function workerStatus($workerId)
+    {
+        return $this->hasOne(SubtaskWorker::class)->where('worker_id', $workerId);
+    }
+
 }
