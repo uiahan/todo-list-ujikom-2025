@@ -44,7 +44,9 @@ Route::group(['prefix' => 'tasker', 'middleware' => ['can:tasker']], function ()
     Route::group(['prefix' => 'manage-job', 'controller' => ManageJobController::class], function(){
         Route::get('/', 'index')->name('manage.job');
         Route::get('/view-job', 'viewJob')->name('view.job');
+        Route::get('/view-worker/{task}', 'viewWorker')->name('view.worker');
         Route::post('/store-job', 'store')->name('store.job');
+        Route::post('/store-worker', 'storeWorker')->name('store.job.worker');
         Route::put('/update-job/{id}', 'update')->name('update.job');
         Route::delete('/delete-job/{id}', 'delete')->name('delete.job');
     });

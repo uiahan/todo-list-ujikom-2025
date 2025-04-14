@@ -46,9 +46,7 @@
                                             data-task-title="{{ $item->title }}">
                                             <i class="fa-regular fa-note"></i>
                                         </button>
-                                        <button class="btn bg-brown text-white" data-bs-toggle="modal"
-                                            data-bs-target="#workerModal" data-bs-title="Worker"><i
-                                                class="fa-regular fa-users"></i></button>
+                                        <a href="{{ route('view.worker', $item->id) }}" class="btn bg-brown text-white btn-open-worker-modal" data-bs-title="Worker"><i class="fa-regular fa-users"></i></a>
                                         <button class="btn bg-brown text-white btn-edit-tasker" data-bs-toggle="modal"
                                             data-bs-target="#editJobModal" data-id="{{ $item->id }}"
                                             data-title="{{ $item->title }}" data-description="{{ $item->description }}"
@@ -120,62 +118,6 @@
         </div>
     </div>
 
-    <div class="modal fade" id="workerModal" tabindex="-1" aria-labelledby="workerModalLabel" aria-hidden="true">
-        <div class="modal-dialog text-second modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="workerModalLabel">Ujikom</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <label class="mb-1">Add Worker</label>
-                        <div class="input-group">
-                            <select id="worker-select" name="worker" class="form-control">
-                                <option value="farhan">Farhan</option>
-                                <option value="nadip">Nadip</option>
-                                <option value="riffa">Riffa</option>
-                                <option value="hilal">Hilal</option>
-                            </select>
-                            <button type="submit" class="btn bg-brown text-white">
-                                <i class="fa-regular fa-plus"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <hr>
-                <div class="pt-2 px-3 pb-3">
-                    <h1 class="modal-title fs-5 mb-1">Worker List</h1>
-                    <table class="table table-bordered text-second" id="workerTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Photo</th>
-                                <th>Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td class="text-center"><img src="{{ asset('images/profile.jpg') }}" width="40"
-                                        alt=""></td>
-                                <td>Farhan Dika</td>
-                                <td>
-                                    <a href="{{ route('view.job') }}" class="btn bg-brown text-white"
-                                        data-bs-title="View"><i class="fa-regular fa-eye"></i></a>
-                                    <button class="btn bg-brown text-white" data-bs-toggle="tooltip"
-                                        data-bs-title="Delete"><i class="fa-regular fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Edit Job -->
     <div class="modal fade" id="editJobModal" tabindex="-1" aria-labelledby="editJobModalLabel" aria-hidden="true">
         <div class="modal-dialog text-second modal-dialog-centered">
@@ -227,7 +169,6 @@
         </div>
     </div>
 
-
     <div class="modal fade" id="questModal" tabindex="-1" aria-labelledby="questModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered text-second">
             <div class="modal-content">
@@ -264,8 +205,6 @@
     @endsection
 
     @push('js')
-        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
         <script>
             new DataTable('#jobTable');
             new DataTable('#workerTable');
@@ -522,14 +461,11 @@
                         let taskDeadline = this.dataset.deadline;
                         const taskRepetition = this.dataset.repetition;
 
-                        // Memastikan format tanggal sesuai dengan input tipe 'date'
                         if (taskDeadline) {
-                            // Mengambil hanya bagian tanggal (YYYY-MM-DD) dari datetime string
                             taskDeadline = taskDeadline.split(' ')[
-                            0]; // Ambil hanya bagian tanggal (YYYY-MM-DD)
+                                0];
                         }
 
-                        // Mengisi data ke dalam modal
                         document.getElementById('edit-title').value = taskTitle;
                         document.getElementById('edit-description').value = taskDescription;
                         document.getElementById('edit-video').value = taskVideo;
@@ -548,6 +484,19 @@
 
                 document.getElementById('saveChangesBtn').addEventListener('click', function() {
                     document.getElementById('editJobForm').submit();
+                });
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const workerButtons = document.querySelectorAll('.btn-open-worker-modal');
+
+                workerButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const taskId = this.dataset.taskId;
+                        document.getElementById('worker-task-id').value = taskId;
+                    });
                 });
             });
         </script>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Tasker;
 
 use App\Http\Controllers\Controller;
 use App\Models\Task;
+use App\Models\TaskWorker;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -15,6 +17,13 @@ class ManageJobController extends Controller
         $user = Auth::user();
         $task = Task::with('subtasks')->where('created_by', $user->id)->get();
         return view('pages.tasker.job.index', compact('user', 'task'));
+    }
+
+    public function viewWorker(Task $task) {
+        $user = Auth::user();
+        $worker = User::where('role', 'worker')->get();
+        $taskWorker = TaskWorker::where('task_id', $task->id)->with('worker')->get();
+        return view('pages.tasker.job.worker-task', compact('user', 'worker', 'taskWorker', 'task'));
     }
 
     public function viewJob()
@@ -93,5 +102,25 @@ class ManageJobController extends Controller
         $job->delete();
 
         return response()->json(['success' => 'Job successfully deleted.']);
+    }
+
+    public function storeWorker(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'task_id' => 'required',
+                'worker_id' => 'required',
+            ]);
+
+            TaskWorker::create([
+                'task_id' => $validated['task_id'],
+                'worker_id' => $validated['worker_id'],
+            ]);
+
+            return redirect()->back()->with('success', 'Worker assign successfully added.');
+        } catch (ValidationException $e) {
+            $firstError = collect($e->validator->errors()->all())->first();
+            return redirect()->back()->with('error', $firstError);
+        }
     }
 }
