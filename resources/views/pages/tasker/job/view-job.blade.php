@@ -3,12 +3,19 @@
 
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+    <style>
+        @media(min-width: 1200px) {
+            .wrap {
+                padding-left: 270px;
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
     <div class="d-flex ps-4 py-4">
         @include('components.sidebar')
-        <div style="padding-left: 270px" class="w-100">
+        <div class="w-100 wrap">
             <div class="pe-4">
                 @include('components.navbar')
                 <div class="card text-second p-3 border-0 shadow-lg mt-4">
@@ -20,69 +27,80 @@
                         </a>
                     </div>
                     <hr>
-                    <table class="table table-bordered text-second" id="jobTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Quest title</th>
-                                <th>Status</th>
-                                <th>Image</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($quest as $item)
-                                @php
-                                    $statusData = $item->subtaskWorkers->where('worker_id', $worker->id)->first();
-                                @endphp
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-second" id="jobTable">
+                            <thead>
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->title }}</td>
-                                    <td>
-                                        @php
-                                            if (!$statusData) {
-                                                $status = 'pending';
-                                            } else {
-                                                $status = $statusData->status;
-                                            }
-
-                                            $badgeClass = match ($status) {
-                                                'pending' => 'danger',
-                                                'in_progres' => 'warning',
-                                                'review' => 'primary',
-                                                'done' => 'success',
-                                                default => 'secondary',
-                                            };
-                                        @endphp
-
-                                        <span class="badge bg-{{ $badgeClass }} text-uppercase">{{ $status }}</span>
-                                    </td>
-                                    <td>
-                                        @if ($statusData && $statusData->image)
-                                            <a href="{{ asset('storage/' . $statusData->image) }}" target="_blank"
-                                                class="btn bg-brown text-white" data-bs-title="Image">
-                                                <i class="fa-regular fa-image"></i>
-                                            </a>
-                                        @else
-                                            <span class="text-muted">Not uploaded yet</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($statusData && $statusData->status === 'review')
-                                            <button class="btn bg-brown text-white" data-bs-toggle="modal"
-                                                data-bs-target="#acceptModal" data-bs-title="Accept">
-                                                <i class="fa-solid fa-check"></i>
-                                            </button>
-                                            <button class="btn bg-brown text-white" data-bs-toggle="modal"
-                                                data-bs-target="#rejectModal" data-bs-title="Reject">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </button>
-                                        @endif
-                                    </td>
+                                    <th>No</th>
+                                    <th>Quest title</th>
+                                    <th>Status</th>
+                                    <th>Image</th>
+                                    <th>Action</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($quest as $item)
+                                    @php
+                                        $statusData = $item->subtaskWorkers->where('worker_id', $worker->id)->first();
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $item->title }}</td>
+                                        <td>
+                                            @php
+                                                if (!$statusData) {
+                                                    $status = 'pending';
+                                                } else {
+                                                    $status = $statusData->status;
+                                                }
+    
+                                                $badgeClass = match ($status) {
+                                                    'pending' => 'danger',
+                                                    'in_progres' => 'warning',
+                                                    'review' => 'primary',
+                                                    'done' => 'success',
+                                                    default => 'secondary',
+                                                };
+                                            @endphp
+    
+                                            <span class="badge bg-{{ $badgeClass }} text-uppercase">{{ $status }}</span>
+                                        </td>
+                                        <td>
+                                            @if ($statusData && $statusData->image)
+                                                <button class="btn bg-brown text-white" data-bs-toggle="modal"
+                                                    data-bs-target="#imageModal" data-bs-title="Image"
+                                                    data-bs-image="{{ asset('storage/' . $statusData->image) }}">
+                                                    <i class="fa-regular fa-image"></i>
+                                                </button>
+                                            @else
+                                                <span class="text-muted">Not uploaded yet</span>
+                                            @endif
+                                        </td>
+    
+                                        <td>
+                                            @if ($statusData && $statusData->status === 'review')
+                                            <div class="d-flex">
+                                                <button class="btn bg-brown text-white btn-accept" data-bs-toggle="modal"
+                                                    data-bs-target="#acceptModal" data-subtask-id="{{ $item->id }}" data-bs-title="Accept"
+                                                    data-worker-id="{{ $worker->id }}"><i class="fa-solid fa-check">
+                                                    </i>
+                                                </button>
+    
+                                                <button class="btn ms-1 bg-brown text-white btn-reject" data-bs-toggle="modal" data-bs-title="Reject"
+                                                    data-bs-target="#rejectModal" data-subtask-id="{{ $item->id }}"
+                                                    data-worker-id="{{ $worker->id }}">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </div>
+                                            @endif
+                                        </td>
+    
+    
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
             </div>
@@ -100,8 +118,9 @@
                 <div class="modal-body">
                     <form action="{{ route('quest.approve') }}" method="POST">
                         @csrf
-                        <input type="text" name="subtask_id" value="{{ $item->id }}">
-                        <input type="text" name="worker_id" value="{{ $worker->id }}">
+                        <input type="hidden" name="subtask_id" id="accept-subtask-id">
+                        <input type="hidden" name="worker_id" id="accept-worker-id">
+
                         <label for="">Insert comment</label>
                         <textarea name="description" required class="form-control"></textarea>
                         <button type="submit" class="btn bg-brown text-white mt-2">Submit</button>
@@ -110,6 +129,22 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal untuk preview gambar -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" id="previewImage" class="img-fluid rounded" alt="Preview" />
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     {{-- reject modal --}}
     <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
@@ -122,17 +157,19 @@
                 <div class="modal-body">
                     <form action="{{ route('quest.reject') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="subtask_id" value="{{ $item->id }}">
-                        <input type="hidden" name="worker_id" value="{{ $worker->id }}">
+                        <input type="hidden" name="subtask_id" id="reject-subtask-id">
+                        <input type="hidden" name="worker_id" id="reject-worker-id">
+
                         <label for="">Insert comment</label>
                         <textarea name="description" required class="form-control"></textarea>
+
                         <button type="submit" class="btn bg-brown text-white mt-2">Submit</button>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
+
 @endsection
 
 @push('js')
@@ -170,14 +207,32 @@
         });
     </script>
     <script>
-        document.querySelectorAll('[data-bs-target="#acceptModal"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.getElementById('approve_subtask_id').value = btn.dataset.subtaskId;
-            });
+        $('#acceptModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const subtaskId = button.data('subtask-id');
+            const workerId = button.data('worker-id');
+
+            $('#accept-subtask-id').val(subtaskId);
+            $('#accept-worker-id').val(workerId);
         });
-        document.querySelectorAll('[data-bs-target="#rejectModal"]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.getElementById('reject_subtask_id').value = btn.dataset.subtaskId;
+
+        $('#rejectModal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const subtaskId = button.data('subtask-id');
+            const workerId = button.data('worker-id');
+
+            $('#reject-subtask-id').val(subtaskId);
+            $('#reject-worker-id').val(workerId);
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageModal = document.getElementById('imageModal');
+            imageModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const imageUrl = button.getAttribute('data-bs-image');
+                const imgElement = imageModal.querySelector('#previewImage');
+
+                imgElement.src = imageUrl;
             });
         });
     </script>

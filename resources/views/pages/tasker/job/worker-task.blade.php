@@ -7,13 +7,19 @@
         #workerTable th {
             text-align: left !important;
         }
+
+        @media(min-width: 1200px) {
+            .wrap {
+                padding-left: 270px;
+            }
+        }
     </style>
 @endpush
 
 @section('content')
     <div class="d-flex ps-4 py-4">
         @include('components.sidebar')
-        <div style="padding-left: 270px" class="w-100">
+        <div class="w-100 wrap">
             <div class="pe-4">
                 @include('components.navbar')
                 <div class="card text-second p-3 border-0 shadow-lg mt-4">
@@ -35,48 +41,52 @@
                         </div>
                     </form>
                     <hr>
-                    <table id="workerTable" class="table table-bordered text-second">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Photo</th>
-                                <th>Nama</th>
-                                <th>Username</th>
-                                <th>No HP</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($taskWorker as $item)
+                    <div class="table-responsive">
+                        <table id="workerTable" class="table table-bordered text-second">
+                            <thead>
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td class="text-center">
-                                        @if ($item->worker->image)
-                                        <img src="{{ asset('storage/' . ($item->worker->image ?? 'images/profile.jpg')) }}"
-                                            width="40" alt="">
-                                        @else
-                                        <img src="{{ asset('images/profile-default.png') }}"
-                                            width="40" alt="">
-                                        @endif
-                                    </td>
-                                    <td>{{ $item->worker->name }}</td>
-                                    <td>{{ $item->worker->username }}</td>
-                                    <td>{{ $item->worker->phone_number }}</td>
-                                    <td>
-                                        <form action="{{ route('delete.job.worker', $item->id) }}" method="POST" onsubmit="return confirm('Yakin mau hapus?')">
-                                        <a href="{{ route('view.job', ['task' => $task->id, 'worker' => $item->worker->id]) }}" class="btn bg-brown text-white"
-                                    data-bs-title="View"><i class="fa-regular fa-eye"></i></a>
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn bg-brown text-white" data-bs-title="Delete">
-                                            <i class="fa-regular fa-trash"></i>
-                                        </button>
-                                    </form>
-                                    </td>
+                                    <th>No</th>
+                                    <th>Photo</th>
+                                    <th>Nama</th>
+                                    <th>Username</th>
+                                    <th>No HP</th>
+                                    <th>Aksi</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($taskWorker as $item)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td class="text-center">
+                                            @if ($item->worker->profile)
+                                            <img src="{{ asset('storage/' . ($item->worker->profile ?? 'images/profile.jpg')) }}"
+                                                width="40" alt="" height="40" style="object-fit: cover">
+                                            @else
+                                            <img src="{{ asset('images/profile-default.png') }}"
+                                                width="40" alt="" height="40" style="object-fit: cover">
+                                            @endif
+                                        </td>
+                                        <td>{{ $item->worker->name }}</td>
+                                        <td>{{ $item->worker->username }}</td>
+                                        <td>{{ $item->worker->phone_number }}</td>
+                                        <td>
+                                            <form action="{{ route('delete.job.worker', $item->id) }}" method="POST" onsubmit="return confirm('Yakin mau hapus?')">
+                                                <div class="d-flex">
+                                                    <a href="{{ route('view.job', ['task' => $task->id, 'worker' => $item->worker->id]) }}" class="btn bg-brown text-white"
+                                                data-bs-title="View"><i class="fa-regular fa-eye"></i></a>
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn ms-1 bg-brown text-white" data-bs-title="Delete">
+                                                        <i class="fa-regular fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                        </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

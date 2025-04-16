@@ -4,19 +4,31 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ManageTaskerController;
 use App\Http\Controllers\Admin\ManageWorkerController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\notificationController;
 use App\Http\Controllers\Tasker\ManageJobController;
 use App\Http\Controllers\Tasker\ManageQuestController;
 use App\Http\Controllers\Tasker\TaskerController;
 use App\Http\Controllers\Worker\JobController;
+use App\Http\Controllers\Worker\PrivateJobController;
 use App\Http\Controllers\Worker\QuestController;
 use App\Http\Controllers\Worker\WorkerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthController::class, 'index'])->name('index');
 
+Route::group(['prefix' => 'notification', 'controller' => notificationController::class], function() {
+    Route::get('/', 'index')->name('notification');
+    Route::post('/mark-notification-as-read', 'markAsRead');
+});
+
 Route::group(['prefix' => 'auth', 'controller' => AuthController::class], function() {
     Route::post('/login', 'login')->name('login');
     Route::post('/logout', 'logout')->name('logout');
+    Route::post('/register', 'register')->name('register');
+    Route::post('/update', 'update')->name('update');
+    Route::get('/register-show', 'registerShow')->name('register.show');
+    Route::get('/profile', 'profile')->name('profile');
+    Route::post('/update-password', 'updatePassword')->name('update.password');
 });
 
 Route::group(['prefix' => 'admin', 'middleware' => ['can:admin']], function (){
@@ -53,9 +65,9 @@ Route::group(['prefix' => 'tasker', 'middleware' => ['can:tasker']], function ()
     });
     Route::group(['prefix' => 'manage-quest', 'controller' => ManageQuestController::class], function(){
         Route::post('/store-quest', 'store')->name('store.quest');
+        Route::get('/quest/{task}', 'getQuest')->name('get.quest');
         Route::post('/approve-quest', 'approve')->name('quest.approve');
         Route::post('/reject-quest', 'reject')->name('quest.reject');
-        Route::get('/quest/{task}', 'getQuest')->name('get.quest');
         Route::delete('/delete-quest/{id}', 'delete')->name('delete.quest');
     });
 });
@@ -64,6 +76,17 @@ Route::group(['prefix' => 'worker', 'middleware' => ['can:worker']], function ()
     Route::get('/dashboard', [WorkerController::class, 'dashboard'])->name('dashboard.worker');
     Route::group(['prefix' => 'my-job', 'controller' => JobController::class], function() {
         Route::get('/', 'index')->name('job');
+    });
+    Route::group(['prefix' => 'private-job', 'controller' => PrivateJobController::class], function() {
+        Route::get('/', 'index')->name('job.private');
+        Route::post('/store-job', 'store')->name('store.job.private');
+        Route::put('/update-job/{id}', 'update')->name('update.job.private');
+        Route::delete('/delete-job/{id}', 'delete')->name('delete.job.private');
+        Route::post('/store-quest/private', 'storeQuest')->name('store.quest.private');
+        Route::get('/quest/{task}', 'getQuest')->name('get.quest.private');
+        Route::delete('/delete-quest/private/{id}', 'deleteQuest')->name('delete.quest');
+        Route::get('/private-quest/{task}', 'privateQuest')->name('private.quest');
+        Route::post('/done-quest', 'done')->name('done.quest');
     });
     Route::group(['prefix' => 'quest-list', 'controller' => QuestController::class], function() {
         Route::get('/{task}', 'index')->name('quest');

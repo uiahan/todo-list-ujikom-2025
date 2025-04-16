@@ -10,6 +10,7 @@ class WorkerController extends Controller
 {
     public function dashboard() {
         $user = Auth::user();
-        return view('pages.worker.dashboard', compact('user'));
+        $jobCount = \App\Models\TaskWorker::where('worker_id', $user->id)->count();
+        return view('pages.worker.dashboard', compact('user', 'jobCount'));
     }
 }

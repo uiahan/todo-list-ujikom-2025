@@ -2,115 +2,95 @@
 @section('title', 'My Job')
 @push('css')
     <style>
-        /* css */
+        @media(min-width: 1200px) {
+            .wrap {
+                padding-left: 270px;
+            }
+        }
     </style>
-@endpush
-@section('content')
-    <div class="d-flex ps-4 py-4">
-        @include('components.sidebar')
-        <div style="padding-left: 270px" class="w-100">
-            <div class="pe-4">
-                @include('components.navbar')
-                <div class="text-second border-left-brown card px-3 pt-3 pb-2 border-0 shadow-lg mt-4">
-                    <div class="d-flex justify-content-between">
-                        <h4>My Job</h4>
-                        <button class="btn bg-brown text-white" data-bs-toggle="modal" data-bs-target="#addJobModal"><i
-                                class="fa-regular fa-plus me-1"></i> Add New Job</button>
-                    </div>
-                </div>
+    @section('content')
+        <div class="d-flex ps-4 py-4">
+            @include('components.sidebar')
+            <div class="w-100 wrap">
+                <div class="pe-4">
+                    @include('components.navbar')
+                    <div class="text-second border-left-brown card px-3 pt-3 pb-2 border-0 shadow-lg mt-4">
+                        <div class="d-flex justify-content-between">
+                            <h4>My Job</h4>
 
-                <div class="row">
-                    @foreach ($taskWorkers as $item)
-                        <div class="col-6">
-                            <div class="card w-100 mb-3 mt-3 border-0 shadow text-white" style="background-color: #3D0A05;">
-                                <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <div class="ratio ratio-4x3 h-100 rounded-start overflow-hidden">
-                                            <img src="{{ asset('storage/' . $item->task->image) }}" alt=""
-                                                style="object-fit: cover">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        @foreach ($taskWorkers as $item)
+                            <div class="col-xl-6 col-12">
+                                <div class="card w-100 mb-3 mt-3 border-0 shadow text-white" style="background-color: #3D0A05;">
+                                    <div class="row g-0">
+                                        <div class="col-md-4">
+                                            <div class="ratio ratio-4x3 h-100 rounded-start overflow-hidden">
+                                                <img src="{{ asset('storage/' . $item->task->image) }}" alt=""
+                                                    style="object-fit: cover">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between">
-                                                <h5 class="card-title mb-1">
-                                                    {{ $item->task->title }}
-                                                </h5>
-                                                <div class="mb-3">
-                                                    <span class="badge bg-primary text-white">On Progress</span>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between">
+                                                    <h5 class="card-title mb-2">
+                                                        {{ $item->task->title }}
+                                                    </h5>
                                                 </div>
+                                                <p class="card-text small mb-2">
+                                                    {{ Str::limit($item->task->description, 80, '...') }}</p>
+                                                <p class="card-text mb-0">
+                                                    <small>
+                                                        @if ($item->done_subtasks === 0)
+                                                            ❌ <span class="fw-bold">Progress:</span>
+                                                            {{ $item->done_subtasks }}/{{ $item->total_subtasks }} pending
+                                                        @elseif ($item->done_subtasks < $item->total_subtasks)
+                                                            🔄 <span class="fw-bold">Progress:</span>
+                                                            {{ $item->done_subtasks }}/{{ $item->total_subtasks }} in progress
+                                                        @else
+                                                            ✅<span class="fw-bold">Progress:</span>
+                                                            {{ $item->done_subtasks }}/{{ $item->total_subtasks }} done
+                                                        @endif
+                                                    </small>
+                                                </p>
+
+                                                <p class="card-text mb-2"><small>📅 <span class="fw-bold">Deadline :</span>
+                                                        {{ $item->task->deadline ? \Carbon\Carbon::parse($item->deadline)->format('Y-m-d') : 'Tidak ada deadline' }}</small>
+                                                </p>
+                                                @php
+                                                    $isExpired =
+                                                        $item->task->deadline &&
+                                                        \Carbon\Carbon::parse($item->task->deadline)->isPast();
+                                                @endphp
+
+                                                @if ($isExpired)
+                                                    <button class="btn btn-secondary d-block fw-bold btn-sm mt-3 w-100"
+                                                        style="font-size: 11px" disabled>
+                                                        ⛔ Deadline Expired
+                                                    </button>
+                                                @else
+                                                    <a href="{{ route('quest', $item->task->id) }}"
+                                                        class="btn btn-light text-second d-block fw-bold btn-sm mt-3"
+                                                        style="font-size: 11px">Start Job</a>
+                                                @endif
+
                                             </div>
-                                            <p class="card-text small mb-2">{{ Str::limit($item->task->description, 80, '...') }}</p>
-                                            <p class="card-text mb-2"><small>📅 <span class="fw-bold">Deadline :</span> {{ $item->task->deadline ? \Carbon\Carbon::parse($item->deadline)->format('Y-m-d') : 'Tidak ada deadline' }}</small></p>
-                                            <div class="progress" style="height: 8px;">
-                                                <div class="progress-bar bg-success" style="width: 45%;" aria-valuenow="45"
-                                                    aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                            <a href="{{ route('quest', $item->task->id) }}"
-                                                class="btn btn-light text-second d-block fw-bold btn-sm mt-3"
-                                                style="font-size: 11px">Start Job</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    {{-- add job modal --}}
-    <div class="modal fade" id="addJobModal" tabindex="-1" aria-labelledby="addJobModalLabel" aria-hidden="true">
-        <div class="modal-dialog text-second modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="addJobModalLabel">Add My Job</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div>
-                            <label for="title">Title</label>
-                            <input required type="text" class="form-control" name="title">
-                        </div>
-                        <div class="mt-3">
-                            <label for="description">Description</label>
-                            <textarea required type="text" class="form-control" name="description"></textarea>
-                        </div>
-                        <div class="mt-3">
-                            <label for="image">Image</label>
-                            <input type="file" accept="image/*" class="form-control" required>
-                        </div>
-                        <div class="mt-3">
-                            <label for="video">Video</label>
-                            <input type="text" class="form-control">
-                        </div>
-                        <div class="mt-3">
-                            <label for="deadline">Deadline</label>
-                            <input type="date" class="form-control" required>
-                        </div>
-                        <div class="mt-3">
-                            <label for="repetition">Repetition</label>
-                            <select name="repetition" id="" class="form-control">
-                                <option value="none" selected>None</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="moonthly">Moonthly</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Submit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
-@push('js')
-    <script>
-        // js
-    </script>
-@endpush
+
+    @endsection
+    @push('js')
+        <script>
+            // js
+        </script>
+    @endpush

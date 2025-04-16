@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\TaskWorker;
 use App\Models\User;
+use App\Notifications\TaskAssignedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -129,13 +130,17 @@ class ManageJobController extends Controller
                 'worker_id' => $validated['worker_id'],
             ]);
 
+            // Kirim notifikasi ke worker
+            $task = Task::find($validated['task_id']);
+            $worker = User::find($validated['worker_id']);
+            $worker->notify(new TaskAssignedNotification($task));
+
             return redirect()->back()->with('success', 'Worker berhasil ditambahkan.');
         } catch (ValidationException $e) {
             $firstError = collect($e->validator->errors()->all())->first();
             return redirect()->back()->with('error', $firstError);
         }
     }
-
 
     public function deleteWorker($id)
     {

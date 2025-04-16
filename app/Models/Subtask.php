@@ -21,6 +21,11 @@ class Subtask extends Model
             ->withTimestamps();
     }
 
+    public function subtask_workers()
+    {
+        return $this->hasMany(SubtaskWorker::class, 'subtask_id');
+    }
+
     public function subtaskWorkers()
     {
         return $this->hasMany(SubtaskWorker::class);

@@ -2,7 +2,7 @@
 <script>
     Swal.fire({
         icon: 'success',
-        title: 'Berhasil!',
+        title: 'Success!',
         text: '{{ session('success') }}',
         confirmButtonText: 'OK',
         customClass: {
@@ -44,4 +44,15 @@
         }
     });
 </script>
+@endif
+
+@if ($errors->any())
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html: `{!! implode('<br>', $errors->all()) !!}`,
+            confirmButtonColor: '#8B4513' // biar nyocok sama bg-brown lo
+        });
+    </script>
 @endif

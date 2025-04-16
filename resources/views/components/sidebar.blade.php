@@ -1,4 +1,4 @@
-<div class="d-flex flex-column position-fixed flex-shrink-0 rounded-4 p-3 bg-white shadow"
+<div class="d-flex flex-column position-fixed flex-shrink-0 rounded-4 p-3 bg-white shadow d-none d-xl-block"
     style="width: 250px; height: 94vh;">
     <div class="text-center">
         <a href="/" class="text-second text-decoration-none fs-4 d-block">
@@ -58,9 +58,9 @@
                     <i class="fa-regular fa-briefcase me-2"></i> My Job
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('manage.job') }}" class="nav-link text-second">
-                    <i class="fa-regular fa-clock-rotate-left me-2"></i> History
+            <li class="nav-item {{ request()->routeIs('job.private') ? 'active-nav-link' : '' }}">
+                <a href="{{ route('job.private') }}" class="nav-link text-second">
+                    <i class="fa-regular fa-lock me-2"></i> Private Job
                 </a>
             </li>
         @endif

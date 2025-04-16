@@ -7,13 +7,19 @@
         #taskerTable th {
             text-align: left !important;
         }
+
+        @media(min-width: 1200px) {
+            .wrap {
+                padding-left: 270px;
+            }
+        }
     </style>
 @endpush
 
 @section('content')
     <div class="d-flex ps-4 py-4">
         @include('components.sidebar')
-        <div style="padding-left: 270px" class="w-100">
+        <div class="w-100 wrap">
             <div class="pe-4">
                 @include('components.navbar')
                 <div class="card text-second p-3 border-0 shadow-lg mt-4">
@@ -23,18 +29,20 @@
                                 class="fa-regular fa-plus me-1"></i> Add Tasker</button>
                     </div>
                     <hr>
-                    <table id="taskerTable" class="table table-bordered text-second">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Photo</th>
-                                <th>Nama</th>
-                                <th>Username</th>
-                                <th>No HP</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="taskerTable" class="table table-bordered text-second">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Photo</th>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Phone Number</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,23 +58,23 @@
                 <form action="{{ route('store.tasker') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Name</label>
                             <input type="text" name="name" class="form-control" required>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Username</label>
                             <input type="text" name="username" class="form-control" required>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Phone Number</label>
                             <input type="text" name="phone_number" class="form-control" required>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Password</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Profile Picture (optional)</label>
                             <input type="file" name="profile" class="form-control">
                         </div>
@@ -91,23 +99,23 @@
                     @method('PUT')
                     <div class="modal-body">
                         <input type="hidden" id="editTaskerId" name="id">
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Name</label>
                             <input type="text" id="editName" name="name" class="form-control" required>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Username</label>
                             <input type="text" id="editUsername" name="username" class="form-control" required>
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Phone Number</label>
                             <input type="text" id="editPhoneNumber" name="phone_number" class="form-control" required>
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label">Password (kosongkan jika tidak ingin diubah)</label>
+                        <div class="mb-3">
+                            <label class="form-label">Password (optional)</label>
                             <input type="password" name="password" class="form-control">
                         </div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Profile Picture</label>
                             <input type="file" name="profile" class="form-control">
                         </div>
@@ -225,13 +233,13 @@
 
         function deleteTasker(id) {
             Swal.fire({
-                title: 'Yakin mau hapus?',
-                text: "Data tidak bisa dikembalikan!",
+                title: 'Sure want to delete?',
+                text: "Data cannot be restored!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3D0A05',
                 cancelButtonColor: '#3D0A05',
-                confirmButtonText: 'Ya, hapus!'
+                confirmButtonText: 'Delete'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({

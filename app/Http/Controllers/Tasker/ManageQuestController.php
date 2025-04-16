@@ -46,40 +46,40 @@ class ManageQuestController extends Controller
     }
 
     public function approve(Request $request)
-{
-    $data = SubtaskWorker::where('subtask_id', $request->subtask_id)
-        ->where('worker_id', $request->worker_id) // bukan auth()->id()
-        ->latest()
-        ->first();
+    {
+        $data = SubtaskWorker::where('subtask_id', $request->subtask_id)
+            ->where('worker_id', $request->worker_id) // bukan auth()->id()
+            ->latest()
+            ->first();
 
-    if (!$data) {
-        return back()->with('error', 'Data tidak ditemukan!');
+        if (!$data) {
+            return back()->with('error', 'Data tidak ditemukan!');
+        }
+
+        $data->update([
+            'status' => 'done',
+            'description' => $request->description,
+        ]);
+
+        return back()->with('success', 'Quest approved');
     }
 
-    $data->update([
-        'status' => 'done',
-        'description' => $request->description,
-    ]);
+    public function reject(Request $request)
+    {
+        $data = SubtaskWorker::where('subtask_id', $request->subtask_id)
+            ->where('worker_id', $request->worker_id);
 
-    return back()->with('success', 'Tugas disetujui');
-}
+        if (!$data) {
+            return back()->with('error', 'Data tidak ditemukan!');
+        }
 
-public function reject(Request $request)
-{
-    $data = SubtaskWorker::where('subtask_id', $request->subtask_id)
-        ->where('worker_id', $request->worker_id);
+        $data->update([
+            'status' => 'pending',
+            'description' => $request->description,
+        ]);
 
-    if (!$data) {
-        return back()->with('error', 'Data tidak ditemukan!');
+        return back()->with('success', 'Tugas dikembalikan ke pending');
     }
-
-    $data->update([
-        'status' => 'pending',
-        'description' => $request->description,
-    ]);
-
-    return back()->with('success', 'Tugas dikembalikan ke pending');
-}
 
 
 }

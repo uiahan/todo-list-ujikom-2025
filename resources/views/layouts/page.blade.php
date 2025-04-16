@@ -18,7 +18,6 @@
     @yield('content')
     @include('components.notification')
 </body>
-<script src="{{ asset('bootstraps/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('bootstraps/js/bootstrap.bundle.min.js') }}"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>

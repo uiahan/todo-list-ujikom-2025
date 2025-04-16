@@ -1,5 +1,5 @@
 @extends('layouts.page')
-@section('title', 'My Job')
+@section('title', 'Private Job')
 
 @push('css')
     <style>
@@ -8,7 +8,7 @@
             padding-right: 10px;
             min-width: 40px;
         }
-
+        
         @media(min-width: 1200px) {
             .wrap {
                 padding-left: 270px;
@@ -25,7 +25,7 @@
                 @include('components.navbar')
                 <div class="text-second border-left-brown card px-3 p-3 border-0 shadow-lg mt-4">
                     <div class="d-flex justify-content-between">
-                        <h4>My Job</h4>
+                        <h4>Private Job</h4>
                         <button data-bs-toggle="modal" data-bs-target="#addJobModal" data-bs-title="Add Job"
                             class="btn bg-brown text-white"><i class="fa-regular fa-plus me-1"></i> Add New Job</button>
                     </div>
@@ -47,22 +47,36 @@
                                                 <h5 class="card-title mb-2">{{ $item->title }}
                                                 </h5>
                                             </div>
+                                            
+                                            
                                             <p class="card-text small mb-2">
                                                 {{ Str::limit($item->description, 80, '...') }}
                                             </p>
-                                            <p class="card-text mb-2"><small>📅 <span class="fw-bold">Deadline :</span>
+                                            <p class="card-text mb-0">
+                                                <small>
+                                                    @if ($item->done_subtasks === 0)
+                                                        ❌<span class="fw-bold">Progress :</span> 
+                                                        {{ $item->done_subtasks }}/{{ $item->total_subtasks }} pending
+                                                    @elseif ($item->done_subtasks < $item->total_subtasks)
+                                                        🔄 <span class="fw-bold">Progress :</span> 
+                                                        {{ $item->done_subtasks }}/{{ $item->total_subtasks }} in progress
+                                                    @else
+                                                        ✅ <span class="fw-bold">Progress :</span> 
+                                                        {{ $item->done_subtasks }}/{{ $item->total_subtasks }} done
+                                                    @endif
+                                                    
+                                                </small>
+                                            </p>
+                                            <p class="card-text mb-2"><small>📅 <span class="fw-bold">Estimate Completed :</span>
                                                     {{ $item->deadline ? \Carbon\Carbon::parse($item->deadline)->format('Y-m-d') : 'Tidak ada deadline' }}</small>
                                             </p>
                                             <div class="d-flex mt-3">
-                                                <button class="btn btn-light open-quest-modal me-1" data-bs-toggle="modal"
+                                                <button class="btn btn-light btn-sm open-quest-modal me-1" data-bs-toggle="modal"
                                                     data-bs-target="#questModal" data-task-id="{{ $item->id }}"
                                                     data-task-title="{{ $item->title }}" data-bs-title="Quest">
                                                     <i class="fa-regular fa-note"></i>
                                                 </button>
-                                                <a href="{{ route('view.worker', $item->id) }}"
-                                                    class="btn me-1 btn-light btn-open-worker-modal"
-                                                    data-bs-title="Worker"><i class="fa-regular fa-users"></i></a>
-                                                <button class="btn btn-light btn-edit-tasker" data-bs-toggle="modal"
+                                                <button class="btn btn-light btn-sm btn-edit-tasker me-1" data-bs-toggle="modal"
                                                     data-bs-target="#editJobModal" data-id="{{ $item->id }}"
                                                     data-title="{{ $item->title }}"
                                                     data-description="{{ $item->description }}"
@@ -72,10 +86,11 @@
                                                     <i class="fa-regular fa-pen-to-square"></i>
                                                 </button>
 
-                                                <button class="btn btn-light btn-delete-tasker ms-1" data-bs-title="Delete"
+                                                <button class="btn btn-light btn-sm btn-delete-tasker me-1" data-bs-title="Delete"
                                                     data-id="{{ $item->id }}" data-title="{{ $item->title }}">
                                                     <i class="fa-regular fa-trash"></i>
                                                 </button>
+                                                <a href="{{ route('private.quest', $item->id) }}" data-bs-title="Start job" class="btn btn-light btn-sm"><i class="fa-regular fa-play"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -96,7 +111,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('store.job') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('store.job.private') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div>
                             <label for="title">Title</label>
@@ -115,7 +130,7 @@
                             <input type="text" class="form-control" name="video">
                         </div>
                         <div class="mt-3">
-                            <label for="deadline">Deadline</label>
+                            <label for="deadline">Estimate Completed</label>
                             <input type="date" class="form-control" name="deadline">
                         </div>
                         <div class="mt-3">
@@ -145,7 +160,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('update.job', ':id') }}" method="POST" enctype="multipart/form-data"
+                    <form action="{{ route('update.job.private', ':id') }}" method="POST" enctype="multipart/form-data"
                         id="editJobForm">
                         @csrf
                         @method('PUT')
@@ -166,7 +181,7 @@
                             <input type="text" class="form-control" name="video" id="edit-video">
                         </div>
                         <div class="mt-3">
-                            <label for="deadline">Deadline</label>
+                            <label for="deadline">Estimate Completed</label>
                             <input type="date" class="form-control" name="deadline" id="edit-deadline" required>
                         </div>
                         <div class="mt-3">
@@ -195,7 +210,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="questForm" method="POST" action="{{ route('store.quest') }}">
+                    <form id="questForm" method="POST" action="{{ route('store.quest.private') }}">
                         @csrf
                         <input type="hidden" name="task_id" id="task_id_field">
                         <label class="mb-1">Add Quest</label>
@@ -319,7 +334,7 @@
                 });
 
                 function fetchQuests(taskId) {
-                    fetch(`/tasker/manage-quest/quest/${taskId}`)
+                    fetch(`/worker/private-job/quest/${taskId}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.length === 0) {
@@ -357,7 +372,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: '/tasker/manage-quest/delete-quest/' + id,
+                                url: '/worker/private-job/delete-quest/private/' + id,
                                 type: 'DELETE',
                                 data: {
                                     _token: '{{ csrf_token() }}'
@@ -400,63 +415,67 @@
             });
         </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.addEventListener('click', function (e) {
-            const deleteBtn = e.target.closest('.btn-delete-tasker');
-            if (!deleteBtn) return;
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('click', function(e) {
+                    const deleteBtn = e.target.closest('.btn-delete-tasker');
+                    if (!deleteBtn) return;
 
-            const taskId = deleteBtn.dataset.id;
-            const taskTitle = deleteBtn.dataset.title;
+                    const taskId = deleteBtn.dataset.id;
+                    const taskTitle = deleteBtn.dataset.title;
 
-            Swal.fire({
-                title: `Hapus "${taskTitle}"?`,
-                text: "Data ini akan hilang permanen.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3D0A05',
-                cancelButtonColor: '#3D0A05',
-                confirmButtonText: 'Ya, hapus!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/tasker/manage-job/delete-job/' + taskId,
-                        type: 'DELETE',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function (response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Terhapus!',
-                                text: response.success || 'Tasker berhasil dihapus.',
-                                confirmButtonText: 'OK',
-                                customClass: {
-                                    confirmButton: 'btn'
+                    Swal.fire({
+                        title: `Hapus "${taskTitle}"?`,
+                        text: "Data ini akan hilang permanen.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3D0A05',
+                        cancelButtonColor: '#3D0A05',
+                        confirmButtonText: 'Ya, hapus!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/worker/private-job/delete-job/' + taskId,
+                                type: 'DELETE',
+                                data: {
+                                    _token: '{{ csrf_token() }}'
                                 },
-                                buttonsStyling: false,
-                                didOpen: () => {
-                                    const swal = Swal.getPopup();
-                                    swal.style.color = '#3D0A05';
-                                    const confirmBtn = swal.querySelector('.btn');
-                                    confirmBtn.style.backgroundColor = '#3D0A05';
-                                    confirmBtn.style.borderColor = '#3D0A05';
-                                    confirmBtn.style.color = 'white';
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Terhapus!',
+                                        text: response.success ||
+                                            'Tasker berhasil dihapus.',
+                                        confirmButtonText: 'OK',
+                                        customClass: {
+                                            confirmButton: 'btn'
+                                        },
+                                        buttonsStyling: false,
+                                        didOpen: () => {
+                                            const swal = Swal.getPopup();
+                                            swal.style.color = '#3D0A05';
+                                            const confirmBtn = swal
+                                                .querySelector('.btn');
+                                            confirmBtn.style.backgroundColor =
+                                                '#3D0A05';
+                                            confirmBtn.style.borderColor =
+                                                '#3D0A05';
+                                            confirmBtn.style.color = 'white';
+                                        }
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                },
+                                error: function(xhr) {
+                                    console.error(xhr.responseText);
+                                    Swal.fire('Oops!', 'Gagal menghapus job.', 'error');
                                 }
-                            }).then(() => {
-                                location.reload();
                             });
-                        },
-                        error: function (xhr) {
-                            console.error(xhr.responseText);
-                            Swal.fire('Oops!', 'Gagal menghapus job.', 'error');
                         }
                     });
-                }
+                });
             });
-        });
-    });
-</script>
+        </script>
 
 
         <script>
@@ -484,7 +503,7 @@
                         document.getElementById('edit-deadline').value = taskDeadline;
                         document.getElementById('edit-repetition').value = taskRepetition;
 
-                        const formAction = '{{ route('update.job', ':id') }}'.replace(':id', taskId);
+                        const formAction = '{{ route('update.job.private', ':id') }}'.replace(':id', taskId);
                         document.getElementById('editJobForm').action = formAction;
 
                         if (taskImage) {
